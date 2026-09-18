@@ -2,12 +2,9 @@ name: 每日股票分析
 
 on:
   schedule:
-    # 北京时间 06:15（对应 UTC 22:15，周一至周五对应 UTC 的周日至周四）
-    - cron: '15 22 * * 0-4'
-    # 北京时间 12:15（对应 UTC 04:15，周一至周五）
-    - cron: '15 4 * * 1-5'
-    # 北京时间 16:45（对应 UTC 08:45，周一至周五）
-    - cron: '45 8 * * 1-5'
+    - cron: '15 22 * * 0-4'   # 北京时间 06:15
+    - cron: '15 4 * * 1-5'    # 北京时间 12:15
+    - cron: '45 8 * * 1-5'    # 北京时间 16:45
 
   workflow_dispatch:
     inputs:
@@ -52,7 +49,6 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
-          # 如果 requirements.txt 中没有 futu-api，并且你不需要富途行情，可以删掉下面这行
           python -c "import futu; print('✅ futu SDK import OK')"
 
       - name: 创建必要目录
@@ -83,7 +79,7 @@ jobs:
           LLM_TEMPERATURE: ${{ vars.LLM_TEMPERATURE || secrets.LLM_TEMPERATURE }}
           LLM_CHANNELS: ${{ vars.LLM_CHANNELS || secrets.LLM_CHANNELS }}
 
-          # OpenAI 兼容 API（智谱 GLM-4.7-Flash 走这里）
+          # OpenAI 兼容 API（智谱 GLM-4.7-Flash）
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_API_KEYS: ${{ secrets.OPENAI_API_KEYS }}
           OPENAI_BASE_URL: ${{ vars.OPENAI_BASE_URL || secrets.OPENAI_BASE_URL }}
@@ -129,7 +125,7 @@ jobs:
           TICKFLOW_BATCH_SIZE: ${{ vars.TICKFLOW_BATCH_SIZE || secrets.TICKFLOW_BATCH_SIZE }}
 
           # ==========================================
-          # 搜索服务（已关闭 Anspire，统一使用 Tavily）
+          # 搜索服务（已关闭 Anspire，仅用 Tavily）
           # ==========================================
           # ANSPIRE_API_KEYS: ${{ secrets.ANSPIRE_API_KEYS }}
           BOCHA_API_KEYS: ${{ secrets.BOCHA_API_KEYS }}
@@ -168,7 +164,7 @@ jobs:
           CUSTOM_WEBHOOK_BEARER_TOKEN: ${{ secrets.CUSTOM_WEBHOOK_BEARER_TOKEN }}
           WEBHOOK_VERIFY_SSL: ${{ vars.WEBHOOK_VERIFY_SSL || secrets.WEBHOOK_VERIFY_SSL || 'true' }}
 
-          # 通知路由策略（去重、免打扰已调整，不拦截早报）
+          # 通知路由（去重、免打扰）
           NOTIFICATION_REPORT_CHANNELS: ${{ vars.NOTIFICATION_REPORT_CHANNELS || secrets.NOTIFICATION_REPORT_CHANNELS }}
           NOTIFICATION_ALERT_CHANNELS: ${{ vars.NOTIFICATION_ALERT_CHANNELS || secrets.NOTIFICATION_ALERT_CHANNELS }}
           NOTIFICATION_SYSTEM_ERROR_CHANNELS: ${{ vars.NOTIFICATION_SYSTEM_ERROR_CHANNELS || secrets.NOTIFICATION_SYSTEM_ERROR_CHANNELS }}
@@ -192,7 +188,7 @@ jobs:
           REPORT_TYPE: ${{ vars.REPORT_TYPE || secrets.REPORT_TYPE || 'simple' }}
           REPORT_LANGUAGE: ${{ vars.REPORT_LANGUAGE || secrets.REPORT_LANGUAGE || 'zh' }}
           REPORT_SHOW_LLM_MODEL: ${{ vars.REPORT_SHOW_LLM_MODEL || secrets.REPORT_SHOW_LLM_MODEL || 'true' }}
-          REPORT_SUMMARY_ONLY: ${{ vars.REPORT_SUMMARY_ONLY || secrets.REPORT_SUMMARY_ONLY || 'false' }}
+          REPORT_SUMMARY_ONLY: ${{ vars.REPORT_SUMMARY_ONLY || secrets.REPORT_SUMMARY_ONLY || 'true' }}
           MERGE_EMAIL_NOTIFICATION: ${{ vars.MERGE_EMAIL_NOTIFICATION || secrets.MERGE_EMAIL_NOTIFICATION || 'true' }}
           SINGLE_STOCK_NOTIFY: ${{ vars.SINGLE_STOCK_NOTIFY || secrets.SINGLE_STOCK_NOTIFY || 'false' }}
           MARKET_REVIEW_ENABLED: ${{ vars.MARKET_REVIEW_ENABLED || secrets.MARKET_REVIEW_ENABLED || 'true' }}
@@ -209,7 +205,7 @@ jobs:
           AGENT_EVENT_MONITOR_ENABLED: ${{ vars.AGENT_EVENT_MONITOR_ENABLED || secrets.AGENT_EVENT_MONITOR_ENABLED || 'true' }}
           AGENT_EVENT_MONITOR_INTERVAL_MINUTES: ${{ vars.AGENT_EVENT_MONITOR_INTERVAL_MINUTES || secrets.AGENT_EVENT_MONITOR_INTERVAL_MINUTES || '15' }}
 
-          # 数据缓存与性能（降低并发，避免模型限流）
+          # 数据缓存与性能
           DATA_CACHE_TTL: ${{ vars.DATA_CACHE_TTL || secrets.DATA_CACHE_TTL || '3600' }}
           MAX_WORKERS: ${{ vars.MAX_WORKERS || secrets.MAX_WORKERS || '1' }}
 
@@ -217,7 +213,7 @@ jobs:
           BACKTEST_EVAL_WINDOW_DAYS: ${{ vars.BACKTEST_EVAL_WINDOW_DAYS || secrets.BACKTEST_EVAL_WINDOW_DAYS || '15' }}
           BACKTEST_NEUTRAL_BAND_PCT: ${{ vars.BACKTEST_NEUTRAL_BAND_PCT || secrets.BACKTEST_NEUTRAL_BAND_PCT || '2.0' }}
 
-          # 系统配置（数据源优先级修复：Baostock 优先，Efinance 降级）
+          # 系统配置
           LOG_LEVEL: INFO
           ENABLE_CHIP_DISTRIBUTION: ${{ vars.ENABLE_CHIP_DISTRIBUTION || secrets.ENABLE_CHIP_DISTRIBUTION || 'false' }}
           ENABLE_FUNDAMENTAL_PIPELINE: ${{ vars.ENABLE_FUNDAMENTAL_PIPELINE || secrets.ENABLE_FUNDAMENTAL_PIPELINE || 'true' }}
@@ -254,6 +250,7 @@ jobs:
           echo "🎯 运行模式: $MODE"
           echo "📊 自选股: $STOCK_LIST"
           echo "📝 报告类型: $REPORT_TYPE"
+          echo "📝 仅推摘要: $REPORT_SUMMARY_ONLY"
           echo "📝 报告语言: $REPORT_LANGUAGE"
           echo ""
 
